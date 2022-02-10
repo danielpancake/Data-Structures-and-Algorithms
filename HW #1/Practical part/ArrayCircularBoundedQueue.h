@@ -37,11 +37,11 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T, C> {
             if (this->isEmpty()) {
                 rear = -1;
                 return {};
-            } else {
-                --(this->containerSize);
             }
-
-            return array[getFront()];
+            
+            T value = array[getFront()];
+            --(this->containerSize);
+            return value;
         };
 
         virtual T peek() {

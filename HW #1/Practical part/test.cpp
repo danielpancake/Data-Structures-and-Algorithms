@@ -1,5 +1,7 @@
 #define DEBUG
+
 #include "ArrayCircularBoundedQueue.h"
+#include "QueuedBoundedStack.h"
 
 int main() {
     ArrayCircularBoundedQueue<int, 3> a;
@@ -15,6 +17,15 @@ int main() {
     a.offer(4);
     a.offer(5);
     a.__debug_print();
+
+    QueuedBoundedStack<int, 10> b;
+    b.push(13);
+    b.push(14);
+    b.push(15);
+    b.__debug_print();
     
+    b.pop();
+    b.__debug_print();
+
     return 0;
 }
