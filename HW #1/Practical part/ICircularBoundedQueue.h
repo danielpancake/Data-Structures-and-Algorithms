@@ -2,7 +2,7 @@
 #include <iostream>
 #endif
 
-template <class T, int C>
+template <class T, const std::size_t C>
 class ICircularBoundedQueue {
     protected:
         int queueSize = 0;
@@ -22,11 +22,16 @@ class ICircularBoundedQueue {
         virtual bool isFull() { return queueSize == C; };
 };
 
-template <class T, int C>
+template <class T, const std::size_t C>
 class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T, C> {
     private:
         T *array;
-        int front = 0, rear = -1;
+        int rear = -1;
+
+        int getFront() {
+            int f = rear - this->queueSize + 1;
+            return C * (f < 0) + f;
+        };
 
     public:
         ArrayCircularBoundedQueue() {
@@ -37,44 +42,36 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T, C> {
             rear = (rear + 1) % C;
             array[rear] = value;
 
-            if (this->isFull()) {
-                front = (rear + 1) % C;
-            } else {
+            if (!this->isFull()) {
                 ++(this->queueSize);
             }
         };
 
         virtual T poll() {
-            int t = front;
-            front = (front + 1) % C;
-            
             if (this->isEmpty()) {
-                front = 0;
                 rear = -1;
-
-                return NULL;
+                return 0;
             } else {
                 --(this->queueSize);
             }
 
-            return array[t];
+            return array[getFront()];
         };
 
         virtual T peek() {
-            return array[front];
+            return array[getFront()];
         };
 
         virtual void flush() {
-            front = 0;
-            rear = -1;
-
             this->queueSize = 0;
+            rear = -1;
         };
 
         #ifdef DEBUG
         void __debug_print() {
-            for (int i = 0; i < C; ++i) {
-                std::cout << array[i] << " ";
+            int f = getFront();
+            for (int i = 0; i < this->queueSize; ++i) {
+                std::cout << array[(f + i) % C] << " ";
             };
             std::cout << std::endl;
         };
