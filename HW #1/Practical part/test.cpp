@@ -1,5 +1,5 @@
 #define DEBUG
-#include "ICircularBoundedQueue.h"
+#include "ArrayCircularBoundedQueue.h"
 
 int main() {
     ArrayCircularBoundedQueue<int, 3> a;
