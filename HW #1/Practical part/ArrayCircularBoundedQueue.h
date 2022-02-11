@@ -6,26 +6,30 @@
 #endif
 
 #include "ICircularBoundedQueue.h"
-#include <cstddef>
 
-template <class T, const std::size_t C>
-class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T, C> {
+template <class T>
+class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T> {
     private:
         T *array;
         int rear = -1;
 
         int getFront() {
             int f = rear - this->size() + 1;
-            return C * (f < 0) + f;
+            return this->capacity() * (f < 0) + f;
         };
 
     public:
-        ArrayCircularBoundedQueue() {
-            array = new T[C];
+        // Inheriting constructor of the super class to inherit the constructor of BoundedContainer class
+        ArrayCircularBoundedQueue(size_t capacity) : ICircularBoundedQueue<T>::ICircularBoundedQueue(capacity) {
+            array = new T[this->capacity()];
+        };
+
+        ~ArrayCircularBoundedQueue() {
+            delete[] array;
         };
 
         virtual void offer(T value) {
-            rear = (rear + 1) % C;
+            rear = (rear + 1) % this->capacity();
             array[rear] = value;
 
             if (!this->isFull()) {
@@ -35,8 +39,8 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T, C> {
 
         virtual T poll() {
             if (this->isEmpty()) {
-                rear = -1;
-                return {};
+                rear = -1; // Resetting rear pointer and returninig an object of the T type
+                return {}; // initialized with an empty list-initializer
             }
             
             T value = array[getFront()];
@@ -57,7 +61,7 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T, C> {
         void __debug_print() {
             int f = getFront();
             for (int i = 0; i < this->size(); ++i) {
-                std::cout << array[(f + i) % C] << " ";
+                std::cout << array[(f + i) % this->capacity()] << " ";
             };
             std::cout << std::endl;
         };

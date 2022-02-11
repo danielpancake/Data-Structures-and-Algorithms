@@ -4,7 +4,7 @@
 #include "QueuedBoundedStack.h"
 
 int main() {
-    ArrayCircularBoundedQueue<int, 3> a;
+    ArrayCircularBoundedQueue<int> a(3);
     a.offer(1);
     a.offer(2);
     a.offer(3);
@@ -18,7 +18,7 @@ int main() {
     a.offer(5);
     a.__debug_print();
 
-    QueuedBoundedStack<int, 10> b;
+    QueuedBoundedStack<int> b(10);
     b.push(13);
     b.push(14);
     b.push(15);

@@ -3,39 +3,39 @@
 
 #include "ArrayCircularBoundedQueue.h"
 #include "IBoundedStack.h"
-#include <cstddef>
 
 /* TODO: Explain approach to the implementation of QueuedBoundedStack.
  * Write down the explanation as a paragraph in the comments to the class QueuedBoundedStack
  */
-template <class T, const std::size_t C>
-class QueuedBoundedStack : public IBoundedStack<T, C> {
+template <class T>
+class QueuedBoundedStack : public IBoundedStack<T> {
     private:
         // Declaring and initializing primary and secondary queues
-        ArrayCircularBoundedQueue<T, C> *q_p, *q_s;
+        ArrayCircularBoundedQueue<T> *q_p, *q_s;
 
     public:
-        QueuedBoundedStack() {
-            q_p = new ArrayCircularBoundedQueue<T, C>;
-            q_s = new ArrayCircularBoundedQueue<T, C>;
+        QueuedBoundedStack(std::size_t capacity) : IBoundedStack<T>::IBoundedStack(capacity) {
+            q_p = new ArrayCircularBoundedQueue<T>(capacity);
+            q_s = new ArrayCircularBoundedQueue<T>(capacity);
         };
 
-        virtual void flush() {
-            q_p->flush();
-            q_s->flush();
-        }
+        ~QueuedBoundedStack() {
+            delete q_p;
+            delete q_s;
+        };
 
         virtual void push(T value) {
-            for (int i = 0; i < this->size(); ++i) {
+            int i = 0;
+            for (; i < this->size(); ++i) {
                 q_s->offer(q_p->poll());
             }
 
             q_p->offer(value);
 
-            for (int i = 0; i < this->size(); ++i) {
+            for (; i > 0; --i) {
                 q_p->offer(q_s->poll());
             }
-
+            
             this->containerSize = q_p->size();
         };
         
@@ -48,6 +48,13 @@ class QueuedBoundedStack : public IBoundedStack<T, C> {
         virtual T top() {
             T value = q_p->peek();
             return value;
+        };
+
+        virtual void flush() {
+            q_p->flush();
+            q_s->flush();
+
+            this->containerSize = 0;
         };
 
         #ifdef DEBUG

@@ -1,11 +1,13 @@
 #ifndef _IBOUNDED_STACK_H_
 #define _IBOUNDED_STACK_H_
 
-#include <cstddef>
+#include "BoundedContainer.h"
 
-template <class T, const std::size_t C>
-class IBoundedStack : public BasicContainer <T, C>{
+template <class T>
+class IBoundedStack : public BoundedContainer<T>{
     public:
+        using BoundedContainer<T>::BoundedContainer;
+        
         virtual void push(T) = 0;
 
         virtual T pop() = 0;

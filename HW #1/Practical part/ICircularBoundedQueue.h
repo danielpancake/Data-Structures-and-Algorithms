@@ -1,12 +1,13 @@
 #ifndef _ICIRCULAR_BOUNDED_QUEUE_H_
 #define _ICIRCULAR_BOUNDED_QUEUE_H_
 
-#include "BasicContainer.h"
-#include <cstddef>
+#include "BoundedContainer.h"
 
-template <class T, const std::size_t C>
-class ICircularBoundedQueue : public BasicContainer<T, C> {
+template <class T>
+class ICircularBoundedQueue : public BoundedContainer<T> {
     public:
+        using BoundedContainer<T>::BoundedContainer;
+
         virtual void offer(T) = 0;
 
         virtual T poll() = 0;
