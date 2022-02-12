@@ -72,56 +72,82 @@ class HashEntry {
         };
 };
 
+#define HASHPRIMES_SIZE 18
+const std::size_t HASHPRIMES[HASHPRIMES_SIZE]{ 53, 97, 193, 389, 769, 1543, 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469 };
+
 template <class T>
 class DoubleHashSet : public ISet<T> {
     private:
         HashEntry<T> *hashtable;
-        std::size_t hashtableSize = 128;
+        std::size_t hashtableSize = 0;
         
-        void expandHashtable() {
-            HashEntry<T> *temp = new HashEntry<T>[hashtableSize * 2];
-
-            std::size_t i = 0;
-            while (i < hashtableSize) {
-                temp[i] = hashtable[i];
-                ++i; 
+        DoubleHashSet(std::size_t size) {
+            hashtable = new HashEntry<T>[HASHPRIMES[size]];
+            hashtableSize = size;
+        };
+        
+        bool expandAndRehashHashtable() {
+            if (hashtableSize >= HASHPRIMES_SIZE) {
+                return false;
             }
 
-            hashtableSize *= 2;
+            DoubleHashSet<T> *temptable = new DoubleHashSet<T>(hashtableSize + 1);
+
+            for (int i = 0; i < getMaxSize(); i++) {
+                if (!hashtable[i].isEmpty() && !hashtable[i].isDead()) {
+                    T v = hashtable[i].getValue();
+                    temptable->add(v);
+                }
+            }
+
+            hashtableSize++;
 
             delete[] hashtable;
-            hashtable = temp;
+            hashtable = temptable->hashtable;
+            return true;
         };
 
-        Pair<bool, std::size_t> find(HashEntry<T> * e) {
+        enum SearchResult { EmptyEntry, FoundEntry, Undefined };
+        Pair<SearchResult, std::size_t> search(HashEntry<T> * e) {
             Pair<std::size_t, std::size_t> hash = hashCodes(e->getValue());
-            
-            std::size_t index = hash.first % hashtableSize;
-            std::size_t j = 0;
+
+            std::size_t index = hash.first % getMaxSize();
+            std::size_t j = 1;
+
+            std::size_t fptr = index;
+            bool first_iter = true;
 
             while (1) {
                 if (hashtable[index].isEmpty()) {
-                    return Pair<bool, std::size_t>(false, 0);
+                    return Pair<SearchResult, std::size_t>(SearchResult::EmptyEntry, index);
                 } else if (hashtable[index] == (*e)) {
-                    return Pair<bool, std::size_t>(true, index);
+                    return Pair<SearchResult, std::size_t>(SearchResult::FoundEntry, index);
+                } else if (!first_iter && fptr == index) {
+                    if (expandAndRehashHashtable()) {
+                        return search(e);
+                    }
+                    return Pair<SearchResult, std::size_t>(SearchResult::Undefined, 0);
                 } else {
-                    index = (hash.first + j * hash.second) % hashtableSize;
+                    index = (hash.first + j * hash.second) % getMaxSize();
                     j++;
                 }
+
+                first_iter = false;
             }
         };
 
         Pair<std::size_t, std::size_t> hashCodes(T value) {
-            return Pair<std::size_t, std::size_t>(std::hash<T>{}(value), (MAGIC_NUMBER * std::hash<T>{}(value)) % SIZE_MAX);
+            std::size_t h = std::hash<T>{}(value);
+            return Pair<std::size_t, std::size_t>(h, (MAGIC_NUMBER * h) % SIZE_MAX);
+        };
+
+        std::size_t getMaxSize() {
+            return HASHPRIMES[hashtableSize];
         };
 
     public:
         DoubleHashSet() {
-            hashtable = new HashEntry<T>[hashtableSize];
-        };
-        
-        DoubleHashSet(std::size_t size) {
-            hashtable = new HashEntry<T>[size];
+            hashtable = new HashEntry<T>[getMaxSize()];
         };
 
         ~DoubleHashSet() {
@@ -130,24 +156,24 @@ class DoubleHashSet : public ISet<T> {
 
         virtual void add(T value) {
             HashEntry<T> e(value);
-            Pair<bool, std::size_t> f = find(&e);
+            Pair<SearchResult, std::size_t> f = search(&e);
 
-            if (!f.first) {
+            if (f.first == SearchResult::EmptyEntry) {
                 // Adding new element to the hashtable and extending it,
                 // if the size of the hashtable exceeds half of its capacity
                 hashtable[f.second] = e;
 
-                if (++this->setSize >= hashtableSize>>1) {
-                    expandHashtable();
+                if ((++this->setSize) / getMaxSize() >= 0.75 + (hashtableSize / HASHPRIMES_SIZE) * 0.25) {
+                    expandAndRehashHashtable();
                 }
             }
         };
 
         virtual void remove(T value) {
             HashEntry<T> e(value);
-            Pair<bool, std::size_t> f = find(&e);
+            Pair<SearchResult, std::size_t> f = search(&e);
 
-            if (f.first) {
+            if (f.first == SearchResult::FoundEntry) {
                 hashtable[f.second].kill();
                 --(this->setSize);
             }
@@ -155,7 +181,7 @@ class DoubleHashSet : public ISet<T> {
 
         virtual bool contains(T value) {
             HashEntry<T> e(value);
-            return find(&e).first;
+            return search(&e).first;
         };
 };
 #endif

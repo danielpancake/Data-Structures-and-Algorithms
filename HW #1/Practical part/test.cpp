@@ -22,8 +22,6 @@ int main() {
 
     a.remove(12);
 
-    std::cout << a.size();
-
     int in; std::cin >> in;
     std::cout << a.contains(in) << std::endl;
 
