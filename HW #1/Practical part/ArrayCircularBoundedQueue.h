@@ -58,7 +58,7 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T> {
         };
 
         #ifdef DEBUG
-        void __debug_print() {
+        void __debugPrint() {
             int f = getFront();
             for (int i = 0; i < this->size(); ++i) {
                 std::cout << array[(f + i) % this->capacity()] << " ";

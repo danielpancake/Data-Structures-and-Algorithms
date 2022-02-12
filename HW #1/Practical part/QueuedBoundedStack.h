@@ -58,7 +58,7 @@ class QueuedBoundedStack : public IBoundedStack<T> {
         };
 
         #ifdef DEBUG
-        void __debug_print() { q_p->__debug_print(); };
+        void __debugPrint() { q_p->__debugPrint(); };
         #endif
 };
 #endif

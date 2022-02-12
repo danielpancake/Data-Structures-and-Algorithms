@@ -10,7 +10,7 @@ class BoundedContainer {
         std::size_t containerSize = 0;
 
     public:
-        explicit BoundedContainer(std::size_t capacity) {
+        BoundedContainer(std::size_t capacity) {
             containerCapacity = capacity;
         };
 

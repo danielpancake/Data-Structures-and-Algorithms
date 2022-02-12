@@ -1,31 +1,31 @@
 #define DEBUG
 
-#include "ArrayCircularBoundedQueue.h"
-#include "QueuedBoundedStack.h"
+#include <iostream>
+#include "DoubleHashSet.h"
 
 int main() {
-    ArrayCircularBoundedQueue<int> a(3);
-    a.offer(1);
-    a.offer(2);
-    a.offer(3);
-    a.__debug_print();
+    DoubleHashSet<int> a;
+    a.add(12);
+    a.add(13);
+    a.add(14);
+    a.add(15);
+    a.add(16);
+    a.add(17);
+    a.add(18);
+    a.add(19);
+    a.add(20);
+    a.add(21);
+    a.add(22);
+    a.add(23);
+    a.add(24);
+    a.add(25);
 
-    a.poll();
-    a.poll();
-    a.__debug_print();
+    a.remove(12);
 
-    a.offer(4);
-    a.offer(5);
-    a.__debug_print();
+    std::cout << a.size();
 
-    QueuedBoundedStack<int> b(10);
-    b.push(13);
-    b.push(14);
-    b.push(15);
-    b.__debug_print();
-    
-    b.pop();
-    b.__debug_print();
+    int in; std::cin >> in;
+    std::cout << a.contains(in) << std::endl;
 
     return 0;
 }
