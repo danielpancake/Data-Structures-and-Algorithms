@@ -19,6 +19,11 @@ class QueuedBoundedStack : public IBoundedStack<T> {
             q_s = new ArrayCircularBoundedQueue<T>(capacity);
         };
 
+        QueuedBoundedStack(const QueuedBoundedStack<T> &qs) : IBoundedStack<T>::IBoundedStack(qs.containerCapacity) {
+            q_p = new ArrayCircularBoundedQueue<T>(*qs.q_p);
+            q_s = new ArrayCircularBoundedQueue<T>(*qs.q_s);
+        };
+
         ~QueuedBoundedStack() {
             delete q_p;
             delete q_s;
@@ -26,7 +31,8 @@ class QueuedBoundedStack : public IBoundedStack<T> {
 
         virtual void push(T value) {
             int i = 0;
-            for (; i < this->size(); ++i) {
+            int s = this->size();
+            for (; i < s; ++i) {
                 q_s->offer(q_p->poll());
             }
 

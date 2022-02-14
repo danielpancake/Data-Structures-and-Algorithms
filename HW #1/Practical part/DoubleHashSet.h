@@ -150,6 +150,11 @@ class DoubleHashSet : public ISet<T> {
             hashtable = new HashEntry<T>[getMaxSize()];
         };
 
+        DoubleHashSet(const DoubleHashSet<T> &dhs) : DoubleHashSet(dhs.hashtableSize) {
+            this->setSize = dhs.setSize;
+            std::copy(dhs.hashtable, dhs.hashtable + getMaxSize(), hashtable);
+        };
+
         ~DoubleHashSet() {
             delete[] hashtable;
         };
@@ -163,7 +168,7 @@ class DoubleHashSet : public ISet<T> {
                 // if the size of the hashtable exceeds half of its capacity
                 hashtable[f.second] = e;
 
-                if ((++this->setSize) / getMaxSize() >= 0.75 + (hashtableSize / HASHPRIMES_SIZE) * 0.25) {
+                if ((++this->setSize) * 2 >= getMaxSize()) {
                     expandAndRehashHashtable();
                 }
             }

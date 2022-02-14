@@ -24,6 +24,12 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T> {
             array = new T[this->capacity()];
         };
 
+        ArrayCircularBoundedQueue(const ArrayCircularBoundedQueue<T> &arcq) : ArrayCircularBoundedQueue(arcq.containerCapacity) {
+            this->containerSize = arcq.containerSize;
+            rear = arcq.rear;
+            std::copy(arcq.array, arcq.array + this->capacity(), array);
+        };
+
         ~ArrayCircularBoundedQueue() {
             delete[] array;
         };

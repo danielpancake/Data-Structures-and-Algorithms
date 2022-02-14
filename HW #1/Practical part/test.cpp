@@ -1,29 +1,28 @@
 #define DEBUG
 
 #include <iostream>
+#include <string>
+
+#include "ArrayCircularBoundedQueue.h"
 #include "DoubleHashSet.h"
+#include "QueuedBoundedStack.h"
 
 int main() {
-    DoubleHashSet<int> a;
-    a.add(12);
-    a.add(13);
-    a.add(14);
-    a.add(15);
-    a.add(16);
-    a.add(17);
-    a.add(18);
-    a.add(19);
-    a.add(20);
-    a.add(21);
-    a.add(22);
-    a.add(23);
-    a.add(24);
-    a.add(25);
+    ArrayCircularBoundedQueue<std::string> c(20);
+    c.offer("I'm first");
+    ArrayCircularBoundedQueue<std::string> d(c);
+    std::cout << c.poll() << " and " << d.poll() << "\n\n";
 
-    a.remove(12);
+    DoubleHashSet<std::string> a;
+    a.add("aaa");
 
-    int in; std::cin >> in;
-    std::cout << a.contains(in) << std::endl;
+    DoubleHashSet<std::string> b = a;
+    std::cout << a.contains("aaa") << " " << b.contains("aaa") << "\n\n";
+
+    QueuedBoundedStack<std::string> e(20);
+    e.push("Hi!");
+    QueuedBoundedStack<std::string> f(e);
+    std::cout << e.pop() << " " << f.pop() << "\n";
 
     return 0;
 }
