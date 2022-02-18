@@ -172,8 +172,8 @@ class DoubleHashSet : public ISet<T> {
                 if ((++this->setSize) * 2 >= getMaxSize()) {
                     expandAndRehashHashtable();
                 }
-            } else if (f.first == SearchResult::EmptyEntry) {
-                e.revive();
+            } else if (f.first == SearchResult::FoundDead) {
+                hashtable[f.second].revive();
                 ++(this->setSize);
             }
         };
@@ -190,7 +190,7 @@ class DoubleHashSet : public ISet<T> {
 
         virtual bool contains(T value) {
             HashEntry<T> e(value);
-            return search(&e).first;
+            return (search(&e).first == SearchResult::FoundEntry);
         };
 };
 #endif
