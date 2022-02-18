@@ -14,6 +14,7 @@ class QueuedBoundedStack : public IBoundedStack<T> {
         ArrayCircularBoundedQueue<T> *q_p, *q_s;
 
     public:
+        QueuedBoundedStack() : IBoundedStack<T>::IBoundedStack(1) {};
         QueuedBoundedStack(std::size_t capacity) : IBoundedStack<T>::IBoundedStack(capacity) {
             q_p = new ArrayCircularBoundedQueue<T>(capacity);
             q_s = new ArrayCircularBoundedQueue<T>(capacity);
@@ -30,15 +31,14 @@ class QueuedBoundedStack : public IBoundedStack<T> {
         };
 
         virtual void push(T value) {
-            int i = 0;
-            int s = this->size();
-            for (; i < s; ++i) {
+            while (!q_p->isEmpty()) {
                 q_s->offer(q_p->poll());
             }
 
             q_p->offer(value);
 
-            for (; i > 0; --i) {
+            int s = q_s->size() - q_s->isFull();
+            for (int i = 0; i < s; ++i) {
                 q_p->offer(q_s->poll());
             }
             

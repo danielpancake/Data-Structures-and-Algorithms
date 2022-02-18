@@ -10,16 +10,10 @@
 template<class F, class S>
 class Pair {
     public:
-        F first;
-        S second;
+        F first; S second;
 
-        Pair() {
-            first = {}, second = {};
-        };
-
-        Pair(F f, S s) {
-            first = f, second = s;
-        };
+        Pair() {};
+        Pair(const F &f, const S &s) : first(f), second(s) {};
 
         bool operator==(Pair p) {
             return p.first == first && p.second == second;
@@ -53,6 +47,10 @@ class HashEntry {
 
         void kill() {
             hashEntryIsDead = true;
+        };
+
+        void revive() {
+            hashEntryIsDead = false;
         };
 
         bool isEmpty() {
@@ -107,7 +105,7 @@ class DoubleHashSet : public ISet<T> {
             return true;
         };
 
-        enum SearchResult { EmptyEntry, FoundEntry, Undefined };
+        enum SearchResult { EmptyEntry, FoundEntry, FoundDead, Undefined };
         Pair<SearchResult, std::size_t> search(HashEntry<T> * e) {
             Pair<std::size_t, std::size_t> hash = hashCodes(e->getValue());
 
@@ -120,7 +118,10 @@ class DoubleHashSet : public ISet<T> {
             while (1) {
                 if (hashtable[index].isEmpty()) {
                     return Pair<SearchResult, std::size_t>(SearchResult::EmptyEntry, index);
-                } else if (hashtable[index] == (*e)) {
+                } else if (hashtable[index].getValue() == e->getValue()) {
+                    if (hashtable[index].isDead()) {
+                        return Pair<SearchResult, std::size_t>(SearchResult::FoundDead, index);
+                    }
                     return Pair<SearchResult, std::size_t>(SearchResult::FoundEntry, index);
                 } else if (!first_iter && fptr == index) {
                     if (expandAndRehashHashtable()) {
@@ -171,6 +172,9 @@ class DoubleHashSet : public ISet<T> {
                 if ((++this->setSize) * 2 >= getMaxSize()) {
                     expandAndRehashHashtable();
                 }
+            } else if (f.first == SearchResult::EmptyEntry) {
+                e.revive();
+                ++(this->setSize);
             }
         };
 

@@ -19,6 +19,7 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T> {
         };
 
     public:
+        ArrayCircularBoundedQueue() : ICircularBoundedQueue<T>::ICircularBoundedQueue(0){};
         // Inheriting constructor of the super class to inherit the constructor of BoundedContainer class
         ArrayCircularBoundedQueue(size_t capacity) : ICircularBoundedQueue<T>::ICircularBoundedQueue(capacity) {
             array = new T[this->capacity()];
@@ -27,7 +28,10 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T> {
         ArrayCircularBoundedQueue(const ArrayCircularBoundedQueue<T> &arcq) : ArrayCircularBoundedQueue(arcq.containerCapacity) {
             this->containerSize = arcq.containerSize;
             rear = arcq.rear;
-            std::copy(arcq.array, arcq.array + this->capacity(), array);
+            
+            for (int i = 0; i < this->containerSize; i++) {
+                array[i] = arcq.array[i];
+            };
         };
 
         ~ArrayCircularBoundedQueue() {
