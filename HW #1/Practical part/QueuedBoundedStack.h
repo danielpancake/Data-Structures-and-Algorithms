@@ -4,8 +4,10 @@
 #include "ArrayCircularBoundedQueue.h"
 #include "IBoundedStack.h"
 
-/* TODO: Explain approach to the implementation of QueuedBoundedStack.
- * Write down the explanation as a paragraph in the comments to the class QueuedBoundedStack
+/**
+ * @brief Implementation of Queued Bounded Stack with two Bounded Queues.
+ * In this implementation method PUSH has time can complexity of O(n),
+ * all other methods (pop, top, and flush) have time complexity of O(1)
  */
 template <class T>
 class QueuedBoundedStack : public IBoundedStack<T> {
@@ -31,22 +33,31 @@ class QueuedBoundedStack : public IBoundedStack<T> {
         };
 
         virtual void push(T value) {
+            /* Implementation note:
+             * First, we move everything from the primary queue (q_p) to the secondary queue (q_s).
+             * Then, a new value is added in front of the q_p. Finally, we move every element
+             * from the q_s back to the q_p. If q_s happens to be full, we move every element but last */
             while (!q_p->isEmpty()) {
                 q_s->offer(q_p->poll());
             }
-
+            
             q_p->offer(value);
 
-            int s = q_s->size() - q_s->isFull();
-            for (int i = 0; i < s; ++i) {
+            while (!q_s->isEmpty() && !q_p->isFull()) {
                 q_p->offer(q_s->poll());
             }
-            
+
+            while (!q_s->isEmpty()) { q_s->poll(); }
+
             this->containerSize = q_p->size();
         };
         
         virtual T pop() {
             T value = q_p->poll();
+            std::cout << "After deletion: ";
+            q_p->__debugPrint();
+            std::cout << "\n";
+            
             this->containerSize = q_p->size();
             return value;
         };
