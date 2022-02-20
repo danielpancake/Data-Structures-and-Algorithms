@@ -6,7 +6,7 @@
 
 /**
  * @brief Implementation of Queued Bounded Stack with two Bounded Queues.
- * In this implementation method PUSH has time can complexity of O(n),
+ * In this implementation method PUSH has time complexity of O(n),
  * all other methods (pop, top, and flush) have time complexity of O(1)
  */
 template <class T>
@@ -36,7 +36,8 @@ class QueuedBoundedStack : public IBoundedStack<T> {
             /* Implementation note:
              * First, we move everything from the primary queue (q_p) to the secondary queue (q_s).
              * Then, a new value is added in front of the q_p. Finally, we move every element
-             * from the q_s back to the q_p. If q_s happens to be full, we move every element but last */
+             * from the q_s back to the q_p. If q_s happens to be full, we move every element but last
+             * and delete it */
             while (!q_p->isEmpty()) {
                 q_s->offer(q_p->poll());
             }
@@ -54,10 +55,6 @@ class QueuedBoundedStack : public IBoundedStack<T> {
         
         virtual T pop() {
             T value = q_p->poll();
-            std::cout << "After deletion: ";
-            q_p->__debugPrint();
-            std::cout << "\n";
-            
             this->containerSize = q_p->size();
             return value;
         };
