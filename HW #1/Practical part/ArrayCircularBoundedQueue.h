@@ -7,6 +7,10 @@
 
 #include "ICircularBoundedQueue.h"
 
+/**
+ * @brief Implementation of Circular Bounded Queue with Arrays.
+ * All methods have time complexity of O(1)
+ */
 template <class T>
 class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T> {
     private:
@@ -29,7 +33,7 @@ class ArrayCircularBoundedQueue : public ICircularBoundedQueue<T> {
             this->containerSize = arcq.containerSize;
             rear = arcq.rear;
             
-            for (int i = 0; i < this->containerSize; i++) {
+            for (int i = 0; i < this->containerSize; ++i) {
                 array[i] = arcq.array[i];
             };
         };
